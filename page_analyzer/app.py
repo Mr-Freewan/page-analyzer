@@ -1,6 +1,6 @@
 from flask import Flask
 
-from cfg import SECRET_KEY
+from page_analyzer.cfg import SECRET_KEY
 
 app = Flask(__name__)
 
