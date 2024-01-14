@@ -1,15 +1,24 @@
-from flask import Flask, render_template
+from datetime import datetime
+
+from flask import Flask, render_template, request, flash, redirect, url_for, \
+    abort
 
 from page_analyzer.cfg import SECRET_KEY
+from page_analyzer.database import get_all_urls, get_url_by_name, \
+    get_url_by_id, insert_url
+from page_analyzer.validators import validate_url
+
+FLASH_MESSAGES = {
+    'zero_len': {'message': 'URL обязателен', 'type': 'danger'},
+    'too_long': {'message': 'URL превышает 255 символов', 'type': 'danger'},
+    'wrong': {'message': 'Некорректный URL', 'type': 'danger'},
+    'exists': {'message': 'Страница уже существует', 'type': 'info'},
+    'success': {'message': 'Страница уже существует', 'type': 'success'},
+}
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = SECRET_KEY
-
-
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
 
 
 @app.route("/")
@@ -17,6 +26,49 @@ def start_page():
     return render_template('index.html')
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
 @app.post("/urls")
-def verify_url():
-    return '<h1>Method not allowed!<h1>', 405
+def add_url():
+    input_url = request.form['url']
+    validation_result = validate_url(input_url)
+    error = validation_result['error']
+
+    if error is None:
+        url_data = {
+            'url': validation_result['url'],
+            'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        url_id = insert_url(url_data)
+
+        return redirect(url_for('show_url_page', id_=url_id))
+
+    if error == 'exists':
+        flash(FLASH_MESSAGES[error]['message'],
+              FLASH_MESSAGES[error]['type'])
+        url = get_url_by_name(validation_result['url'])
+        return redirect(url_for('show_url_page', id_=url['id']))
+
+    flash(FLASH_MESSAGES[error]['message'],
+          FLASH_MESSAGES[error]['type'])
+
+    return render_template('index.html'), 422
+
+
+@app.get("/urls")
+def show_urls():
+    urls = get_all_urls()
+    return render_template('urls_table.html', rows=urls)
+
+
+@app.route("/urls/<int:id_>")
+def show_url_page(id_):
+    url_data = get_url_by_id(id_)
+
+    if not url_data:
+        abort(404)
+
+    return render_template('url_info.html', url=url_data)
