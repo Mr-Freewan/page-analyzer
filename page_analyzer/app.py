@@ -7,7 +7,7 @@ from page_analyzer.cfg import SECRET_KEY
 from page_analyzer.database import get_all_urls, get_url_by_name, \
     get_url_by_id, insert_url, insert_url_checking_result, \
     get_url_checking_results
-from page_analyzer.validators import validate_url
+from page_analyzer.url_checks import validate_url
 
 FLASH_MESSAGES = {
     'zero_len': {'message': 'URL обязателен',

@@ -27,5 +27,4 @@ def validate_url(url):
         if get_url_by_name(normalized_url):
             validation_result['error'] = 'exists'
 
-    print(validation_result)
     return validation_result
