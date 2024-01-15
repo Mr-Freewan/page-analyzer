@@ -1,5 +1,6 @@
 from urllib.parse import urlparse
-
+import requests
+from requests.exceptions import RequestException
 import validators
 from page_analyzer.database import get_url_by_name
 
@@ -28,3 +29,15 @@ def validate_url(url):
             validation_result['error'] = 'exists'
 
     return validation_result
+
+
+def check_page_ceo(url):
+    check = {}
+    response = requests.get(url)
+
+    if response.status_code != 200:
+        raise RequestException
+
+    check['status_code'] = response.status_code
+
+    return check

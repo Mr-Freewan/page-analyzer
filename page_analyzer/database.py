@@ -32,7 +32,8 @@ def insert_url_checking_result(row_data):
         with connection.cursor() as cursor:
             cursor.execute(query, (row_data['url_id'],
                                    row_data['created_at'],
-                                   None, None, None, None))
+                                   row_data['status_code'],
+                                   None, None, None))
 
 
 def get_all_urls():
@@ -41,10 +42,11 @@ def get_all_urls():
             urls.id,
             name,
             urls.created_at,
+            status_code,
             MAX(url_checks.created_at) AS last_check
         FROM urls
         LEFT JOIN url_checks ON urls.id = url_checks.url_id
-        GROUP BY urls.id, name
+        GROUP BY urls.id, name, status_code
         ORDER BY urls.id DESC
         '''
     with make_db_connection() as connection:
