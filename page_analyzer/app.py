@@ -5,15 +5,25 @@ from flask import Flask, render_template, request, flash, redirect, url_for, \
 
 from page_analyzer.cfg import SECRET_KEY
 from page_analyzer.database import get_all_urls, get_url_by_name, \
-    get_url_by_id, insert_url
+    get_url_by_id, insert_url, insert_url_checking_result, \
+    get_url_checking_results
 from page_analyzer.validators import validate_url
 
 FLASH_MESSAGES = {
-    'zero_len': {'message': 'URL обязателен', 'type': 'danger'},
-    'too_long': {'message': 'URL превышает 255 символов', 'type': 'danger'},
-    'wrong': {'message': 'Некорректный URL', 'type': 'danger'},
-    'exists': {'message': 'Страница уже существует', 'type': 'info'},
-    'success': {'message': 'Страница уже существует', 'type': 'success'},
+    'zero_len': {'message': 'URL обязателен',
+                 'type': 'danger'},
+    'too_long': {'message': 'URL превышает 255 символов',
+                 'type': 'danger'},
+    'wrong': {'message': 'Некорректный URL',
+              'type': 'danger'},
+    'exists': {'message': 'Страница уже существует',
+               'type': 'info'},
+    'success': {'message': 'Страница уже существует',
+                'type': 'success'},
+    'check_success': {'message': 'Страница успешно проверена',
+                      'type': 'success'},
+    'check_failed': {'message': 'Произошла ошибка при проверке',
+                     'type': 'danger'}
 }
 
 app = Flask(__name__)
@@ -72,3 +82,17 @@ def show_url_page(id_):
         abort(404)
 
     return render_template('url_info.html', url=url_data)
+
+
+@app.post("/urls/<int:id_>/checks")
+def check_url(id_):
+    url_data = get_url_by_id(id_)
+    created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    row_data = {'url_id': id_, 'created_at': created_at}
+    insert_url_checking_result(row_data)
+    flash(FLASH_MESSAGES['check_success']['message'],
+          FLASH_MESSAGES['check_success']['type'])
+    checks = get_url_checking_results(id_)
+
+    return render_template('url_info.html', url=url_data,
+                           checks=checks)
