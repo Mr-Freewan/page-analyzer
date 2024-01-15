@@ -18,7 +18,7 @@ FLASH_MESSAGES = {
               'type': 'danger'},
     'exists': {'message': 'Страница уже существует',
                'type': 'info'},
-    'success': {'message': 'Страница уже существует',
+    'success': {'message': 'Страница успешно добавлена',
                 'type': 'success'},
     'check_success': {'message': 'Страница успешно проверена',
                       'type': 'success'},
@@ -53,6 +53,8 @@ def add_url():
             'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
         url_id = insert_url(url_data)
+        flash(FLASH_MESSAGES['success']['message'],
+              FLASH_MESSAGES['success']['type'])
 
         return redirect(url_for('show_url_page', id_=url_id))
 
