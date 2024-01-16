@@ -33,15 +33,18 @@ def insert_url_checking_result(row_data):
             cursor.execute(query, (row_data['url_id'],
                                    row_data['created_at'],
                                    row_data['status_code'],
-                                   None, None, None))
+                                   row_data['h1'],
+                                   row_data['title'],
+                                   row_data['description'])
+                           )
 
 
 def get_all_urls():
     query = '''
         SELECT
             urls.id,
-            name,
             urls.created_at,
+            name,
             status_code,
             MAX(url_checks.created_at) AS last_check
         FROM urls

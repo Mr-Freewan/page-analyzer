@@ -3,6 +3,7 @@ import requests
 from requests.exceptions import RequestException
 import validators
 from page_analyzer.database import get_url_by_name
+from bs4 import BeautifulSoup
 
 
 def normalize_url(url):
@@ -31,13 +32,24 @@ def validate_url(url):
     return validation_result
 
 
-def check_page_ceo(url):
-    check = {}
+def get_ceo_data(url):
+    checking_result = {}
     response = requests.get(url)
 
     if response.status_code != 200:
         raise RequestException
 
-    check['status_code'] = response.status_code
+    checking_result['status_code'] = response.status_code
 
-    return check
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    h1_tag = soup.find('h1')
+    title_tag = soup.find('title')
+    description_tag = soup.find('meta', attrs={'name': 'description'})
+
+    checking_result['h1'] = h1_tag.text.strip() if h1_tag else ''
+    checking_result['title'] = title_tag.text.strip() if title_tag else ''
+    checking_result['description'] = description_tag['content'].strip() \
+        if description_tag else ''
+
+    return checking_result

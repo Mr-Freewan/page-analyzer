@@ -7,7 +7,7 @@ from page_analyzer.cfg import SECRET_KEY
 from page_analyzer.database import get_all_urls, get_url_by_name, \
     get_url_by_id, insert_url, insert_url_checking_result, \
     get_url_checking_results
-from page_analyzer.url_checks import validate_url, check_page_ceo
+from page_analyzer.url_checks import validate_url, get_ceo_data
 
 FLASH_MESSAGES = {
     'zero_len': {'message': 'URL обязателен',
@@ -92,18 +92,19 @@ def check_url(id_):
     created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     try:
-        check_result = check_page_ceo(url_data['name'])
-        row_data = {'url_id': id_,
-                    'created_at': created_at,
-                    'status_code': check_result['status_code']}
-        insert_url_checking_result(row_data)
+        checking_result = get_ceo_data(url_data['name'])
+        checking_result['url_id'] = id_
+        checking_result['created_at'] = created_at
+
+        insert_url_checking_result(checking_result)
+
         flash(FLASH_MESSAGES['check_success']['message'],
               FLASH_MESSAGES['check_success']['type'])
     except RequestException:
         flash(FLASH_MESSAGES['check_failed']['message'],
               FLASH_MESSAGES['check_failed']['type'])
 
-    checks = get_url_checking_results(id_)
+    checks_data = get_url_checking_results(id_)
 
     return render_template('url_info.html', url=url_data,
-                           checks=checks)
+                           checks=checks_data)
