@@ -92,8 +92,11 @@ def show_url_page(id_):
     if not url_data:
         abort(404)
 
+    checks_data = get_url_checking_results(id_)
+
     return render_template('url_info.html',
-                           url=url_data,)
+                           url=url_data,
+                           checks=checks_data)
 
 
 @app.post("/urls/<int:id_>/checks")
