@@ -8,12 +8,12 @@ from requests.exceptions import RequestException
 from page_analyzer.database import get_url_by_field
 
 
-def normalize_url(url):
+def normalize_url(url: str) -> str:
     parsed_url = urlparse(url)
     return f'{parsed_url.scheme}://{parsed_url.netloc}'
 
 
-def validate_url(url):
+def validate_url(url: str) -> dict:
     validation_result = {
         'url': url,
         'error': None
@@ -34,7 +34,7 @@ def validate_url(url):
     return validation_result
 
 
-def get_ceo_data(url):
+def get_ceo_data(url: str) -> dict:
     checking_result = {}
     response = requests.get(url)
 

@@ -1,14 +1,15 @@
 import psycopg2
-from psycopg2.extras import RealDictCursor
+from psycopg2.extras import RealDictCursor, RealDictRow
 
 from page_analyzer.cfg import DATABASE_URL
+from typing import Any
 
 
 def make_db_connection():
     return psycopg2.connect(DATABASE_URL)
 
 
-def insert_url(url_data):
+def insert_url(url_data: dict) -> int:
     query = '''
         INSERT
         INTO urls (name, created_at)
@@ -22,7 +23,7 @@ def insert_url(url_data):
             return cursor.fetchone()[0]
 
 
-def insert_url_checking_result(row_data):
+def insert_url_checking_result(row_data: dict) -> None:
     query = '''
     INSERT
     INTO url_checks (url_id, created_at, status_code, h1, title, description)
@@ -39,7 +40,7 @@ def insert_url_checking_result(row_data):
                            )
 
 
-def get_all_urls():
+def get_all_urls() -> list[RealDictRow]:
     query = '''
         SELECT
             urls.id,
@@ -58,7 +59,7 @@ def get_all_urls():
             return cursor.fetchall()
 
 
-def get_url_by_field(field_name, field_value):
+def get_url_by_field(field_name: str, field_value: Any):
     query = f'''
         SELECT *
         FROM urls
@@ -70,7 +71,7 @@ def get_url_by_field(field_name, field_value):
             return cursor.fetchone()
 
 
-def get_url_checking_results(id_):
+def get_url_checking_results(id_: int) -> list[RealDictRow]:
     query = '''
             SELECT *
             FROM url_checks
