@@ -1,9 +1,11 @@
 from urllib.parse import urlparse
+
 import requests
-from requests.exceptions import RequestException
 import validators
-from page_analyzer.database import get_url_by_name
 from bs4 import BeautifulSoup
+from requests.exceptions import RequestException
+
+from page_analyzer.database import get_url_by_field
 
 
 def normalize_url(url):
@@ -26,7 +28,7 @@ def validate_url(url):
     else:
         normalized_url = normalize_url(url)
         validation_result['url'] = normalized_url
-        if get_url_by_name(normalized_url):
+        if get_url_by_field('name', normalized_url):
             validation_result['error'] = 'exists'
 
     return validation_result

@@ -58,27 +58,15 @@ def get_all_urls():
             return cursor.fetchall()
 
 
-def get_url_by_name(url):
-    query = '''
+def get_url_by_field(field_name, field_value):
+    query = f'''
         SELECT *
         FROM urls
-        WHERE name=%s
+        WHERE {field_name}=%s
         '''
     with make_db_connection() as connection:
         with connection.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute(query, (url,))
-            return cursor.fetchone()
-
-
-def get_url_by_id(id_):
-    query = '''
-        SELECT *
-        FROM urls
-        WHERE id=%s
-        '''
-    with make_db_connection() as connection:
-        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute(query, (id_,))
+            cursor.execute(query, (field_value,))
             return cursor.fetchone()
 
 

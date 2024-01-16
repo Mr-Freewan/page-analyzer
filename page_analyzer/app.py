@@ -1,12 +1,20 @@
 from datetime import datetime
 
-from flask import Flask, render_template, request, flash, redirect, url_for, \
-    abort
+from flask import (Flask,
+                   render_template,
+                   request,
+                   flash,
+                   redirect,
+                   url_for,
+                   abort)
 from requests.exceptions import RequestException
+
 from page_analyzer.cfg import SECRET_KEY
-from page_analyzer.database import get_all_urls, get_url_by_name, \
-    get_url_by_id, insert_url, insert_url_checking_result, \
-    get_url_checking_results
+from page_analyzer.database import (get_all_urls,
+                                    get_url_by_field,
+                                    insert_url,
+                                    insert_url_checking_result,
+                                    get_url_checking_results)
 from page_analyzer.url_checks import validate_url, get_ceo_data
 
 FLASH_MESSAGES = {
@@ -61,7 +69,8 @@ def add_url():
     if error == 'exists':
         flash(FLASH_MESSAGES[error]['message'],
               FLASH_MESSAGES[error]['type'])
-        url = get_url_by_name(validation_result['url'])
+        url = get_url_by_field('name', validation_result['url'])
+
         return redirect(url_for('show_url_page', id_=url['id']))
 
     flash(FLASH_MESSAGES[error]['message'],
@@ -78,17 +87,18 @@ def show_urls():
 
 @app.route("/urls/<int:id_>")
 def show_url_page(id_):
-    url_data = get_url_by_id(id_)
+    url_data = get_url_by_field('id', id_)
 
     if not url_data:
         abort(404)
 
-    return render_template('url_info.html', url=url_data)
+    return render_template('url_info.html',
+                           url=url_data,)
 
 
 @app.post("/urls/<int:id_>/checks")
 def check_url(id_):
-    url_data = get_url_by_id(id_)
+    url_data = get_url_by_field('id', id_)
     created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     try:
@@ -106,5 +116,6 @@ def check_url(id_):
 
     checks_data = get_url_checking_results(id_)
 
-    return render_template('url_info.html', url=url_data,
+    return render_template('url_info.html',
+                           url=url_data,
                            checks=checks_data)
