@@ -1,6 +1,8 @@
 # Simple Page Analyzer (SPA)
 
 [![Actions Status](https://github.com/Mr-Freewan/python-project-83/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/Mr-Freewan/python-project-83/actions)
+[![CI check](https://github.com/Mr-Freewan/python-project-83/actions/workflows/work-check.yml/badge.svg)](https://github.com/Mr-Freewan/python-project-83/actions/workflows/work-check.yml)
+[![Maintainability](https://api.codeclimate.com/v1/badges/2d7b759fc7462a88dc10/maintainability)](https://codeclimate.com/github/Mr-Freewan/python-project-83/maintainability)
 
 ### Description
 
