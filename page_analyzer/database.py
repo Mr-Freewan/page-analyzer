@@ -3,10 +3,16 @@ from psycopg2.extras import RealDictCursor, RealDictRow
 
 from page_analyzer.cfg import DATABASE_URL
 from typing import Any
+from contextlib import contextmanager
 
 
-def make_db_connection():
-    return psycopg2.connect(DATABASE_URL)
+@contextmanager
+def connection():
+    conn = psycopg2.connect(DATABASE_URL)
+    try:
+        yield conn
+    finally:
+        conn.close()
 
 
 def insert_url(url_data: dict) -> int:
@@ -16,10 +22,11 @@ def insert_url(url_data: dict) -> int:
         VALUES (%s, %s)
         RETURNING id
         '''
-    with make_db_connection() as connection:
-        with connection.cursor() as cursor:
+    with connection() as conn:
+        with conn.cursor() as cursor:
             cursor.execute(query, (url_data['url'],
                                    url_data['created_at']))
+            conn.commit()
             return cursor.fetchone()[0]
 
 
@@ -29,8 +36,8 @@ def insert_url_checking_result(row_data: dict) -> None:
     INTO url_checks (url_id, created_at, status_code, h1, title, description)
     VALUES (%s, %s, %s, %s, %s, %s)
     '''
-    with make_db_connection() as connection:
-        with connection.cursor() as cursor:
+    with connection() as conn:
+        with conn.cursor() as cursor:
             cursor.execute(query, (row_data['url_id'],
                                    row_data['created_at'],
                                    row_data['status_code'],
@@ -38,6 +45,7 @@ def insert_url_checking_result(row_data: dict) -> None:
                                    row_data['title'],
                                    row_data['description'])
                            )
+            conn.commit()
 
 
 def get_all_urls() -> list[RealDictRow]:
@@ -53,8 +61,8 @@ def get_all_urls() -> list[RealDictRow]:
         GROUP BY urls.id, name, status_code
         ORDER BY urls.id DESC
         '''
-    with make_db_connection() as connection:
-        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+    with connection() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(query)
             return cursor.fetchall()
 
@@ -65,8 +73,8 @@ def get_url_by_field(field_name: str, field_value: Any):
         FROM urls
         WHERE {field_name}=%s
         '''
-    with make_db_connection() as connection:
-        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+    with connection() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(query, (field_value,))
             return cursor.fetchone()
 
@@ -78,7 +86,7 @@ def get_url_checking_results(id_: int) -> list[RealDictRow]:
             WHERE url_id=%s
             ORDER BY created_at DESC
             '''
-    with make_db_connection() as connection:
-        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+    with connection() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(query, (id_,))
             return cursor.fetchall()
