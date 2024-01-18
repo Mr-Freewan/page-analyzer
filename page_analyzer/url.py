@@ -8,12 +8,12 @@ from requests.exceptions import RequestException
 from page_analyzer.database import get_url_by_field
 
 
-def normalize_url(url: str) -> str:
+def normalize(url: str) -> str:
     parsed_url = urlparse(url)
     return f'{parsed_url.scheme}://{parsed_url.netloc}'
 
 
-def validate_url(url: str) -> dict:
+def validate(url: str) -> dict:
     validation_result = {
         'url': url,
         'error': None
@@ -26,7 +26,7 @@ def validate_url(url: str) -> dict:
     elif not validators.url(url):
         validation_result['error'] = 'wrong'
     else:
-        normalized_url = normalize_url(url)
+        normalized_url = normalize(url)
         validation_result['url'] = normalized_url
         if get_url_by_field('name', normalized_url):
             validation_result['error'] = 'exists'

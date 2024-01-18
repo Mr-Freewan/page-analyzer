@@ -18,7 +18,7 @@ from page_analyzer.database import (get_all_urls,
                                     insert_url,
                                     insert_url_checking_result,
                                     get_url_checking_results)
-from page_analyzer.url_checks import validate_url, get_ceo_data
+from page_analyzer.url import validate, get_ceo_data
 
 FLASH_MESSAGES = {
     'zero_len': {'message': 'URL обязателен',
@@ -60,7 +60,7 @@ def page_not_found(e) -> tuple[str, int]:
 @app.post("/urls")
 def add_url() -> tuple[str, int] | Response:
     input_url = request.form['url']
-    validation_result = validate_url(input_url)
+    validation_result = validate(input_url)
     error = validation_result['error']
 
     if error is None:
