@@ -9,7 +9,7 @@
 SPA is an application based on the Flask framework that analyzes specified
 pages for SEO suitability.
 
-Demo app is [HERE](https://page-analyzer-alr1.onrender.com/).
+Demo app is [HERE](https://page-analyzer-alr1.onrender.com/)  (Requests can be delayed about 50 seconds or more).
 
 ### Features
 
