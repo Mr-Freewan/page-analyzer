@@ -51,7 +51,7 @@ This project was built using these tools:
 
 Clone the project:
 
-    git clone https://github.com/Mr-Freewan/python-project-83.git && cd python-project-83
+    git clone https://github.com/Mr-Freewan/page-analyzer.git && cd page-analyzer
 
 Then install dependencies:
 
